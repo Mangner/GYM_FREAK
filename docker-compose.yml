@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # 1. Usługa Backendu (FastAPI + Uvicorn)
+  backend:
+    build: ./backend
+    container_name: fastapi_app
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app # Synchronizacja kodu źródłowego
+    env_file:
+      - ./.env # Wczytanie zmiennych środowiskowych
+    depends_on:
+      - db # Uruchom dopiero po starcie bazy danych
+
+  # 2. Usługa Bazy Danych (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env # Wczytanie zmiennych środowiskowych
+    ports:
+      - "5432:5432" # Udostępnij port tylko jeśli potrzebujesz dostępu z zewnątrz
+
+  # 3. Usługa do zarządzania bazą (pgAdmin)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_ui
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+  # 4. Usługa Frontendu (React)
+  frontend:
+    build: ./frontend
+    container_name: react_app
+    restart: always
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend/src:/app/src # Synchronizacja tylko kodu źródłowego
+
+volumes:
+  postgres_data: # Definicja wolumenu do przechowywania danych bazy

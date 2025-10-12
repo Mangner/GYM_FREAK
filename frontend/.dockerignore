@@ -1,0 +1,13 @@
+# Zależności - zostaną zainstalowane wewnątrz kontenera
+node_modules
+
+# Pliki produkcyjne - zostaną stworzone wewnątrz kontenera
+dist
+build
+
+# Pliki logów i debugowania
+npm-debug.log
+.eslintcache
+
+# Pliki środowiskowe (nigdy nie powinny trafić do obrazu)
+.env*
