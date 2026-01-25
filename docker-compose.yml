@@ -3,7 +3,9 @@ version: '3.8'
 services:
   # 1. Usługa Backendu (FastAPI + Uvicorn)
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
     container_name: fastapi_app
     restart: always
     ports:
@@ -12,6 +14,9 @@ services:
       - ./backend:/app # Synchronizacja kodu źródłowego
     env_file:
       - ./.env # Wczytanie zmiennych środowiskowych
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
     depends_on:
       - db # Uruchom dopiero po starcie bazy danych
 
@@ -22,6 +27,7 @@ services:
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - ./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     env_file:
       - ./.env # Wczytanie zmiennych środowiskowych
     ports:
@@ -42,7 +48,9 @@ services:
 
   # 4. Usługa Frontendu (React)
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend/Dockerfile
     container_name: react_app
     restart: always
     ports:

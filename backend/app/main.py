@@ -1,28 +1,14 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
 
-app = FastAPI()
+from app.api import router as api_router
+from app.database import Base, engine
 
-
-class Item(BaseModel):
-    text : str = None
-    is_done : bool = False
+app = FastAPI(title="Gym Freak API")
 
 
-items = []
-
-@app.get("/")
-def root():
-    return {"Witaj": "Kolego"}
+@app.on_event("startup")
+def on_startup() -> None:
+    Base.metadata.create_all(bind=engine)
 
 
-@app.post("/items")
-def create_item(item: str):
-    items.append(item)
-    return items
-
-
-@app.get("/items/{item_id}")
-def get_item(item_id : int) -> str:
-    item = items[item_id]
-    return item
+app.include_router(api_router)
