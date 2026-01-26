@@ -16,5 +16,5 @@ class Organization(Party):
     description: Mapped[Optional[str]] = mapped_column(String(500))
 
     __mapper_args__ = {
-        "polymorphic_identity": "organization",
+        "polymorphic_identity": "ORGANIZATION",
     }

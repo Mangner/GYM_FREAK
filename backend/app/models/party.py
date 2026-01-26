@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from .party_address import PartyAddress
     from .registered_identifier import RegisteredIdentifier
     from .party_role import PartyRole
+    from .relationship import PartyRelationship
 
 
 class Party(Base):
@@ -32,6 +33,18 @@ class Party(Base):
     roles: Mapped[List["PartyRole"]] = relationship(
         "PartyRole",
         back_populates="party",
+        cascade="all, delete-orphan",
+    )
+    outgoing_relationships: Mapped[List["PartyRelationship"]] = relationship(
+        "PartyRelationship",
+        foreign_keys="PartyRelationship.from_party_id",
+        back_populates="from_party",
+        cascade="all, delete-orphan",
+    )
+    incoming_relationships: Mapped[List["PartyRelationship"]] = relationship(
+        "PartyRelationship",
+        foreign_keys="PartyRelationship.to_party_id",
+        back_populates="to_party",
         cascade="all, delete-orphan",
     )
 

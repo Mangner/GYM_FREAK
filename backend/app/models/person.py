@@ -22,5 +22,5 @@ class Person(Party):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
 
     __mapper_args__ = {
-        "polymorphic_identity": "person",
+        "polymorphic_identity": "PERSON",
     }
