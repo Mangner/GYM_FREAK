@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -5,7 +7,14 @@ from app import models
 from app.api.routers import organizations, parties, people
 from app.database import engine
 
-app = FastAPI(title="Gym Freak API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    models.Base.metadata.create_all(bind=engine)
+    yield
+
+
+app = FastAPI(title="Gym Freak API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -14,11 +23,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    models.Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")
